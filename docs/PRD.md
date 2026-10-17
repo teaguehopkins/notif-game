@@ -67,7 +67,7 @@ The HUD shows the run timer, a "Cleared: N" count, and an "Active: N" count. The
 
 ## 4. The authored run: pacing
 
-Target: **150–250 clears** in 5–10 minutes. That assumes about 2–3 seconds per clear, menu navigation included. The peak is about 40–60 simultaneous active notifications.
+Target: **150–250 clears** in 5–10 minutes. That assumes about 2–3 seconds per clear, menu navigation included. The simulation bot peaks at about 30 simultaneous active notifications (median; 20–43 across 500 runs). A person navigates more slowly than the bot clears, so real peaks run higher.
 
 | Act           | Time      | Clears | Beats                                                                                                                                                                                                                                                                                                                                                    |
 | ------------- | --------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

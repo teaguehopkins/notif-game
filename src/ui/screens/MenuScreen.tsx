@@ -23,8 +23,8 @@ function ItemCard({ inst, active }: { inst: Instance; active: boolean }) {
       <button
         class={`item-card${active ? ' item-card--new' : ' item-card--seen'}${def.kind === 'achievement' ? ' item-card--ach' : ''}${active && isHinted(def.at ?? '') ? ' hinted' : ''}`}
         onClick={open}
-        aria-disabled={!active}
-        aria-label={`${inst.title}${active ? (view ? ', new. Activate to mark as seen.' : ', new. Activate to open.') : ', seen'}`}
+        // Seen cards are just a record; keep them out of the Tab order.
+        disabled={!active}
       >
         <span class="item-card__icon" aria-hidden="true">
           {def.icon ?? '•'}
@@ -79,7 +79,7 @@ export function MenuScreen() {
                 onClick={() => game.selectTab(c.id)}
               >
                 <span aria-hidden="true">{c.icon}</span> {c.label}
-                <Badge count={e.countUnder(p)} label={c.label} />
+                <Badge count={e.countUnder(p)} />
               </button>
             );
           })}

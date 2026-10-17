@@ -1,9 +1,9 @@
-import type { ComponentProps } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { MAX_SNOOZES } from '../../engine/engine';
 import type { Instance, NotifDef } from '../../engine/types';
 import { sfx } from '../../audio/sfx';
 import { prefersReducedMotion } from '../motion';
+import { FocusButton } from './FocusButton';
 import { Modal } from './Modal';
 
 interface Props {
@@ -85,18 +85,6 @@ function Interaction(p: InteractionProps) {
     default:
       return <Dismiss {...p} />;
   }
-}
-
-/** Focuses a button that appears mid-interaction, so keyboard focus isn't dropped. */
-function useFocusOnMount<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  useEffect(() => ref.current?.focus(), []);
-  return ref;
-}
-
-function FocusButton(props: ComponentProps<'button'>) {
-  const ref = useFocusOnMount<HTMLButtonElement>();
-  return <button ref={ref} {...props} />;
 }
 
 function Body({ text }: { text: string }) {

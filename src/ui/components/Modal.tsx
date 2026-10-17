@@ -60,7 +60,7 @@ export function Modal({ title, icon, children, onClose, variant = 'default', lay
         tabIndex={-1}
         onKeyDown={onKeyDown}
       >
-        <header class="modal__header">
+        <div class="modal__header">
           {icon && (
             <span class="modal__icon" aria-hidden="true">
               {icon}
@@ -74,7 +74,7 @@ export function Modal({ title, icon, children, onClose, variant = 'default', lay
               ✕
             </button>
           )}
-        </header>
+        </div>
         {children}
       </div>
     </div>

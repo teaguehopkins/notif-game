@@ -1,6 +1,7 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { FINALE_CREDITS } from '../../content/finale';
 import { Badge } from '../components/Badge';
+import { FocusButton } from '../components/FocusButton';
 import { game, useEngine } from '../game';
 import { prefersReducedMotion } from '../motion';
 
@@ -18,12 +19,25 @@ const CREDITS: [string, string[]][] = [
 ];
 
 export function Credits() {
-  useEngine();
+  return useEngine().isActive(FINALE_CREDITS) ? <CreditsRoll /> : null;
+}
+
+function CreditsRoll() {
   const [reduced] = useState(prefersReducedMotion);
   const [ended, setEnded] = useState(reduced);
-  if (!game.engine.isActive(FINALE_CREDITS)) return null;
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => ref.current?.focus(), []);
   return (
-    <div class="credits" role="dialog" aria-modal="true" aria-label="Credits">
+    <div
+      ref={ref}
+      class="credits"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Credits"
+      tabIndex={-1}
+      // The only control is the dot at the end; keep Tab from wandering into the launcher behind.
+      onKeyDown={(e) => e.key === 'Tab' && e.preventDefault()}
+    >
       <div
         class={reduced ? 'credits__roll credits__roll--static' : 'credits__roll'}
         onAnimationEnd={() => setEnded(true)}
@@ -38,10 +52,10 @@ export function Credits() {
         ))}
       </div>
       {ended && (
-        <button class="credits__dot" onClick={() => game.clear(FINALE_CREDITS)} autoFocus>
+        <FocusButton class="credits__dot" onClick={() => game.clear(FINALE_CREDITS)}>
           1 New Notification
           <Badge count={1} />
-        </button>
+        </FocusButton>
       )}
     </div>
   );

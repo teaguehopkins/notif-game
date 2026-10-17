@@ -22,57 +22,49 @@ export function TopBar() {
 
   return (
     <header class="topbar">
-      <button
-        class="profile-chip"
-        onClick={() => game.navigate('profile')}
-        aria-label={`Profile, level ${level}`}
-      >
+      <button class="profile-chip" onClick={() => game.navigate('profile')}>
         <span class="profile-chip__avatar" aria-hidden="true">
           {game.avatar.value}
         </span>
-        <span class="profile-chip__level">Lv {level}</span>
+        <span class="profile-chip__level">
+          <span class="sr-only">Profile, level </span>
+          <span aria-hidden="true">Lv </span>
+          {level}
+        </span>
         <span class="xp-bar" aria-hidden="true">
           <span class="xp-bar__fill" style={{ width: `${xpPct}%` }} />
         </span>
-        <Badge count={e.countUnder('profile')} label="Profile" />
+        <Badge count={e.countUnder('profile')} />
       </button>
 
-      <div class="currencies" aria-label="Currencies">
+      <div class="currencies" role="group" aria-label="Currencies">
         {CURRENCIES.filter((c) => c.key === 'gold' || (s[c.key] ?? 0) > 0).map((c) => (
-          <span
-            class="currency"
-            key={c.key}
-            title={c.label}
-            aria-label={`${s[c.key] ?? 0} ${c.label}`}
-          >
+          <span class="currency" key={c.key} title={c.label}>
             <span aria-hidden="true">{c.icon}</span> {s[c.key] ?? 0}
+            <span class="sr-only"> {c.label}</span>
           </span>
         ))}
       </div>
 
-      <div class="hud" aria-label="Run stats">
+      <div class="hud" role="group" aria-label="Run stats">
         {zen ? (
-          <span class="hud__stat" title="Lifetime zen clears">
-            🧘 {game.save.value.zenLifetime}
+          <span class="hud__stat" title="Lifetime zen clears" data-stat="zen">
+            <span aria-hidden="true">🧘</span> {game.save.value.zenLifetime}
+            <span class="sr-only"> cleared in zen, lifetime</span>
           </span>
         ) : (
-          <span
-            class="hud__stat hud__time"
-            title="Run time"
-            aria-label={`Time ${formatTime(time)}`}
-          >
-            ⏱ {formatTime(time)}
+          <span class="hud__stat hud__time" title="Run time" data-stat="time">
+            <span aria-hidden="true">⏱</span>
+            <span class="sr-only">Time </span> {formatTime(time)}
           </span>
         )}
-        <span class="hud__stat" title="Cleared" aria-label={`${s.cleared ?? 0} cleared`}>
-          ✓ {s.cleared ?? 0}
+        <span class="hud__stat" title="Cleared" data-stat="cleared">
+          <span aria-hidden="true">✓</span> {s.cleared ?? 0}
+          <span class="sr-only"> cleared</span>
         </span>
-        <span
-          class="hud__stat hud__active"
-          title="Active notifications"
-          aria-label={`${e.activeCount} active`}
-        >
+        <span class="hud__stat hud__active" title="Active notifications" data-stat="active">
           <span class="hud__dot" aria-hidden="true" /> {e.activeCount}
+          <span class="sr-only"> active</span>
         </span>
       </div>
 

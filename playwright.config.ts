@@ -6,7 +6,8 @@ export default defineConfig({
   use: { baseURL: 'http://localhost:4173' },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'phone', use: { ...devices['Pixel 7'] } },
+    // The smallest common phone: Pixel 7 touch/UA at iPhone SE dimensions.
+    { name: 'phone', use: { ...devices['Pixel 7'], viewport: { width: 375, height: 667 } } },
   ],
   webServer: {
     command: 'npm run build && npx vite preview --port 4173 --strictPort',

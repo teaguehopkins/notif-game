@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { unlockAudio } from '../../audio/sfx';
 import { formatTime } from '../../share/share';
 import { game } from '../game';
@@ -46,6 +46,11 @@ export function Title() {
   };
 
   const ready = progress >= 1;
+  const startRef = useRef<HTMLButtonElement>(null);
+  // autoFocus doesn't apply to a button that was disabled while loading.
+  useEffect(() => {
+    if (ready) startRef.current?.focus();
+  }, [ready]);
   return (
     <main class="title">
       <p class="title__presents">Clear All presents</p>
@@ -72,7 +77,7 @@ export function Title() {
           class="btn btn--gold btn--huge"
           disabled={!ready}
           onClick={() => begin('story')}
-          autoFocus
+          ref={startRef}
         >
           {save.runsCompleted > 0 ? 'Play Again' : 'Start'}
         </button>

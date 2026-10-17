@@ -80,3 +80,85 @@ export async function freshStart(page: Page): Promise<void> {
   await page.reload();
   await page.getByRole('button', { name: 'Start' }).click({ timeout: 8000 });
 }
+
+/** Presses Tab until `target` has focus. Throws if it can't get there, which is the bug. */
+async function tabTo(page: Page, target: Locator, max = 80): Promise<void> {
+  const handle = await target.elementHandle();
+  for (let i = 0; i < max; i++) {
+    if (await page.evaluate((el) => el === document.activeElement, handle)) return;
+    await page.keyboard.press('Tab');
+  }
+  throw new Error(`could not Tab to ${await target.evaluate((el) => el.outerHTML.slice(0, 80))}`);
+}
+
+/** Like step(), but using only the keyboard: Tab to the thing, then Enter (or hold Space). */
+export async function keyboardStep(page: Page): Promise<void> {
+  const press = async (target: Locator, key = 'Enter') => {
+    await tabTo(page, target.first());
+    await page.keyboard.press(key);
+  };
+  if (await page.locator('.credits').count()) {
+    const dot = page.locator('.credits__dot');
+    if (await dot.count()) await press(dot);
+    else await page.waitForTimeout(500);
+    return;
+  }
+  const dialogs = page.locator('.modal-backdrop [role=dialog]');
+  if (await dialogs.count()) {
+    const dlg = dialogs.last();
+    const box = dlg.locator('.scroll-box');
+    if (await box.count()) {
+      await tabTo(page, box);
+      await page.keyboard.press('End');
+      await dlg.locator('.modal__actions .btn--gold:not([disabled])').waitFor();
+    }
+    if (await dlg.locator('.btn--hold').count()) {
+      await tabTo(page, dlg.locator('.btn--hold'));
+      await page.keyboard.down(' ');
+      await page.waitForTimeout(1700);
+      await page.keyboard.up(' ');
+      return;
+    }
+    if (await dlg.locator('.tiny-x').count()) return press(dlg.locator('.tiny-x'));
+    if (await dlg.locator('.dodge-x').count()) {
+      await tabTo(page, dlg.locator('.dodge-x'));
+      for (let i = 0; i < 4 && (await dlg.locator('.dodge-x').count()); i++) {
+        await page.keyboard.press('Enter');
+        await page.waitForTimeout(200);
+      }
+      return;
+    }
+    const gold = dlg.locator('.modal__actions button.btn--gold:not([disabled])');
+    if (await gold.count()) return press(gold);
+    const any = dlg.locator('.modal__actions button:not([disabled])');
+    if (await any.count()) return press(any);
+    await page.waitForTimeout(300);
+    return;
+  }
+  if (await page.locator('.screen').count()) {
+    for (const sel of ['.item-card--new', '.tab:has(.badge)', '.back-btn']) {
+      if (await page.locator(sel).count()) return press(page.locator(sel));
+    }
+  }
+  const target = page.locator('.play-btn:has(.badge), .menu-tile:has(.badge)');
+  if (await target.count()) return press(target);
+  await page.waitForTimeout(400);
+}
+
+/** playUntil, keyboard edition. Tab failures are real failures, so only click races are retried. */
+export async function keyboardPlayUntil(
+  page: Page,
+  done: () => Promise<boolean>,
+  maxMs = 240_000,
+): Promise<void> {
+  page.setDefaultTimeout(2500);
+  const t0 = Date.now();
+  while (!(await done())) {
+    if (Date.now() - t0 > maxMs) throw new Error('keyboard bot timed out');
+    try {
+      await keyboardStep(page);
+    } catch (e) {
+      if (String(e).includes('could not Tab')) throw e;
+    }
+  }
+}

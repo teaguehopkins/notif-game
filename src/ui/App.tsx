@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { Badge } from './components/Badge';
+import { FocusKeeper } from './components/FocusKeeper';
 import { Modal } from './components/Modal';
 import { ModalHost } from './components/ModalHost';
 import { Toasts } from './components/Toasts';
@@ -53,6 +54,7 @@ function Launcher() {
       <ModalHost />
       <Credits />
       <Toasts />
+      <FocusKeeper />
     </div>
   );
 }

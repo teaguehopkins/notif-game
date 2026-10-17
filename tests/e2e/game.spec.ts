@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
-import { freshStart, playUntil } from './bot';
+import AxeBuilder from '@axe-core/playwright';
+import { freshStart, keyboardPlayUntil, playUntil } from './bot';
 
 const pageErrors = new WeakMap<Page, string[]>();
 
@@ -16,10 +17,14 @@ test.afterEach(({ page }) => {
 test('smoke: start, clear the first popup, the HUD counts it', async ({ page }) => {
   await freshStart(page);
   await expect(page.getByRole('dialog', { name: 'Welcome to Legends of Loot!' })).toBeVisible();
-  await expect(page.getByLabel('0 cleared')).toBeVisible();
+  const cleared = page.locator('[data-stat=cleared]');
+  await expect(cleared).toHaveText(/^\D*0 cleared$/);
   await page.getByRole('button', { name: "Let's go!" }).click();
-  await expect(page.getByLabel('1 cleared')).toBeVisible();
-  await expect(page.getByLabel(/Achievements, \d+ new/)).toBeVisible();
+  await expect(cleared).toHaveText(/^\D*1 cleared$/);
+  // The next popup is aria-modal, which hides the launcher from role queries; check the tile directly.
+  await expect(page.locator('.menu-tile', { hasText: 'Achievements' })).toHaveAccessibleName(
+    /Achievements \(\d+ new\)/,
+  );
 });
 
 test('full run reaches Inbox Zero, credits, and results', async ({ page }) => {
@@ -56,7 +61,7 @@ test('zen mode keeps spawning and counts lifetime clears', async ({ page }) => {
   await playUntil(
     page,
     async () =>
-      Number((await page.getByTitle('Lifetime zen clears').innerText()).replace(/\D/g, '')) >= 10,
+      Number((await page.locator('[data-stat=zen]').innerText()).replace(/\D/g, '')) >= 10,
     60_000,
   );
   // Popups sit above everything, Exit Zen included, and zen keeps spawning them.
@@ -106,5 +111,31 @@ test('keyboard only: start and clear the boot popups', async ({ page }) => {
     await page.keyboard.press('Enter');
     await page.waitForTimeout(150);
   }
-  await expect(page.getByLabel(/^[1-9]\d* cleared$/)).toBeVisible();
+  await expect(page.locator('[data-stat=cleared]')).not.toHaveText(/^\D*0 cleared$/);
+});
+
+test('keyboard only: a full run, start to results', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  // Start takes focus by itself once loading finishes.
+  await expect(page.getByRole('button', { name: 'Start' })).toBeFocused({ timeout: 8000 });
+  await page.keyboard.press('Enter');
+  await keyboardPlayUntil(page, async () => (await page.locator('.results').count()) > 0);
+  await expect(page.getByRole('heading', { name: 'You Cleared All Notifications' })).toBeVisible();
+});
+
+test('no axe violations on home, a menu, and a popup', async ({ page }) => {
+  await freshStart(page);
+  const scan = async (where: string) => {
+    const { violations } = await new AxeBuilder({ page }).analyze();
+    expect(violations.map((v) => `${where}: ${v.id} (${v.nodes.length}) ${v.help}`)).toEqual([]);
+  };
+  await scan('popup');
+  await playUntil(page, async () => (await page.locator('[role=dialog]').count()) === 0);
+  await page.waitForTimeout(400);
+  await scan('home');
+  await page.getByRole('button', { name: /^.*Achievements/ }).click();
+  await page.waitForTimeout(400);
+  await scan('menu');
 });

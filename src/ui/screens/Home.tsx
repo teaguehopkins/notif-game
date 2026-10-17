@@ -18,7 +18,7 @@ function MenuTile({ node }: { node: NavNode }) {
         {node.icon}
       </span>
       <span class="menu-tile__label">{node.label}</span>
-      <Badge count={count} label={node.label} />
+      <Badge count={count} />
     </button>
   );
 }
@@ -37,7 +37,7 @@ export function Home() {
         onClick={() => game.pressPlay()}
       >
         <span>{playCount ? 'ZEN' : 'PLAY'}</span>
-        <Badge count={playCount} label="Play" />
+        <Badge count={playCount} />
       </button>
       <nav class="menu-grid" aria-label="Main menu">
         {game.visibleMenus().map((n) => (

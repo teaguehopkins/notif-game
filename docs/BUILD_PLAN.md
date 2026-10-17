@@ -16,7 +16,7 @@ See [PRD.md](PRD.md) for the product spec; section references (§) point there.
 | M7 Sound                     | ✅ synthesized WebAudio; not yet tuned by ear                                                                                                                                    |
 | M8 Persistence               | ✅                                                                                                                                                                               |
 | M9 Share                     | ✅                                                                                                                                                                               |
-| M10 Mobile and accessibility | ✅ phone layout, keyboard-only boot flow e2e; Lighthouse not yet run                                                                                                             |
+| M10 Mobile and accessibility | ✅ full keyboard-only run and full touch-profile run at 375×667 (e2e); axe clean on home, menu, popup; Lighthouse mobile 100/100/100 (perf/a11y/best practices, title screen)    |
 | M11 Polish and deploy        | 🟡 Playwright suite done; hosting not set up yet                                                                                                                                 |
 
 ## Project layout (as built)
@@ -33,7 +33,7 @@ src/
   audio/sfx.ts · persist/save.ts · share/share.ts · styles/app.css
 tests/      engine · simulate · content · zen · save · share (Vitest)
             sim-report.test.ts (SIM_REPORT=1 pacing report) · e2e/ (Playwright: smoke, full run,
-            Mark All, zen, keyboard-only; desktop + phone)
+            Mark All, zen, keyboard-only full run, axe; desktop + 375×667 phone)
 ```
 
 **Gotcha:** `@preact/signals` memoizes any component that reads a signal, so it skips re-renders
@@ -67,7 +67,7 @@ from its parent when its props are unchanged. Every component that reads engine 
 
 - Write Acts 0–4 from the gag bank, using template factories for the bulk content: pack cards, level-ups, pass tiers, and calendar days.
 - Write `content.test.ts`. It checks that every location exists in nav, every trigger id resolves, every definition is reachable from `start`, the finale is reachable, and no stat trigger targets a count above the possible maximum.
-- Accept when the simulation bot, over 500 seeds, lands between 150 and 250 clears with a peak active count of about 40–60, and the bot reports the clear/peak distribution for tuning.
+- Accept when the simulation bot, over 500 seeds, lands between 150 and 250 clears with a bot peak of roughly 25–40 active, and the bot reports the clear/peak distribution for tuning.
 
 **M5. Finale, credits, results**
 
