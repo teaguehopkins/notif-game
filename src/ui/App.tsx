@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'preact/hooks';
+import { Ambience } from './components/Ambience';
 import { Badge } from './components/Badge';
 import { FocusKeeper } from './components/FocusKeeper';
+import { FxLayer } from './components/FxLayer';
 import { Modal } from './components/Modal';
 import { ModalHost } from './components/ModalHost';
 import { Toasts } from './components/Toasts';
 import { TopBar } from './components/TopBar';
-import { game } from './game';
+import { game, useEngine } from './game';
 import { Credits } from './screens/Credits';
 import { Home } from './screens/Home';
 import { MenuScreen } from './screens/MenuScreen';
@@ -13,8 +15,11 @@ import { Results } from './screens/Results';
 import { Title } from './screens/Title';
 
 function Launcher() {
+  const e = useEngine();
   const route = game.route.value;
   const zen = game.screen.value === 'zen';
+  const festival = !zen && e.phase === 'main' && e.hasFired('event_begins');
+  const zero = !zen && e.phase !== 'main';
   const [leaving, setLeaving] = useState(false);
 
   // Esc on a menu screen goes home (modals handle their own Esc).
@@ -28,8 +33,11 @@ function Launcher() {
   }, []);
 
   return (
-    <div class={`launcher${zen ? ' launcher--zen' : ''}`}>
+    <div
+      class={`launcher${zen ? ' launcher--zen' : ''}${festival ? ' launcher--event' : ''}${zero ? ' launcher--zero' : ''}${game.zeroMoment.value ? ' launcher--zero-moment' : ''}`}
+    >
       <TopBar />
+      <Ambience />
       {route ? <MenuScreen key={route} /> : <Home />}
       {zen && (
         <button class="exit-zen" onClick={() => setLeaving(true)}>
@@ -59,7 +67,7 @@ function Launcher() {
   );
 }
 
-export function App() {
+function Screen() {
   switch (game.screen.value) {
     case 'title':
       return <Title />;
@@ -68,4 +76,13 @@ export function App() {
     default:
       return <Launcher />;
   }
+}
+
+export function App() {
+  return (
+    <>
+      <Screen />
+      <FxLayer />
+    </>
+  );
 }

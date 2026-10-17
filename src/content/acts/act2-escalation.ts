@@ -1,12 +1,17 @@
-import type { NotifDef } from '../../engine/types';
+import type { NotifDef, Rarity } from '../../engine/types';
 import { ach, after, afterAll, currency, item, popup, stat } from '../helpers';
 
-const PACK_CARDS: [string, string][] = [
-  ['Gobbo the Mildly Inconvenient', '1 mana 1/1. Battlecry: Send your opponent a notification.'],
-  ['Sir Clicksalot', '3 mana 2/4. Whenever you click something, gain +0/+0.'],
-  ['Dot Elemental', '2 mana 3/2. Cannot be cleared.'],
-  ['Badge Golem', '6 mana 6/6. Has a little red dot on it.'],
-  ['The Notifimancer', '9 mana 1/1. Legendary. Summons 30 notifications.'],
+const PACK_CARDS: [string, string, string, Rarity][] = [
+  [
+    'Gobbo the Mildly Inconvenient',
+    '1 mana 1/1. Battlecry: Send your opponent a notification.',
+    '👺',
+    'common',
+  ],
+  ['Sir Clicksalot', '3 mana 2/4. Whenever you click something, gain +0/+0.', '🛡️', 'common'],
+  ['Dot Elemental', '2 mana 3/2. Cannot be cleared.', '🔴', 'rare'],
+  ['Badge Golem', '6 mana 6/6. Has a little red dot on it.', '🗿', 'epic'],
+  ['The Notifimancer', '9 mana 1/1. Legendary. Summons 30 notifications.', '🧙', 'legendary'],
 ];
 
 const LEVELS = [2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -42,10 +47,11 @@ export const act2: NotifDef[] = [
     rewards: { xp: 50 },
     cta: 'Open Pack',
   }),
-  ...PACK_CARDS.map(([title, body], i) =>
+  ...PACK_CARDS.map(([title, body, icon, rarity], i) =>
     item(`card_${i + 1}`, 'collection/cards', `NEW: ${title}`, after('shop_freepack'), {
-      icon: '🃏',
+      icon,
       body,
+      rarity,
     }),
   ),
   item(
@@ -54,10 +60,12 @@ export const act2: NotifDef[] = [
     'Duplicate: Dot Elemental. You can disenchant this!',
     after('shop_freepack'),
     {
-      icon: '♻️',
+      icon: '🔴',
       interaction: 'choice',
       outcomes: ['Disenchant', 'Keep'],
-      body: 'Disenchanting gives you Dust, a new currency.',
+      body: '2 mana 3/2. A second copy. Disenchanting gives you Dust, a new currency.',
+      // It glows legendary in the pack. It is not.
+      rarity: 'legendary',
     },
   ),
   popup('dust_reward', 'Disenchanted!', after('card_dupe', 'Disenchant'), {

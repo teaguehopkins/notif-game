@@ -13,22 +13,27 @@ export function shareLine(cleared: number, ms: number): string {
 
 interface NavLike {
   share?: (data: ShareData) => Promise<void>;
+  canShare?: (data: ShareData) => boolean;
   clipboard?: { writeText(text: string): Promise<void> };
 }
 
 /**
  * Web Share where it's native (touch devices), else the clipboard, else tell the caller to show
- * the text for manual copying.
+ * the text for manual copying. With an image, native sharing includes it when the browser can
+ * share files. The image must already exist: building it after the click would use up the click's
+ * permission to open the share sheet (Safari).
  */
 export async function shareResult(
   text: string,
   url: string,
   nav: NavLike = navigator,
   preferNative = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches,
+  image?: File,
 ): Promise<ShareResult> {
   if (preferNative && nav.share) {
     try {
-      await nav.share({ text, url });
+      const withImage = image && nav.canShare?.({ files: [image] });
+      await nav.share(withImage ? { files: [image], text, url } : { text, url });
       return 'shared';
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') return 'cancelled';

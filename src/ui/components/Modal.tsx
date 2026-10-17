@@ -10,12 +10,25 @@ interface Props {
   variant?: 'default' | 'finale' | 'small';
   /** Stack position, so later modals sit on top. */
   layer?: number;
+  /** How many more popups are queued behind this one; drawn as a pile of cards. */
+  behind?: number;
+  /** Extra class on the dialog, e.g. for legendary notifications. */
+  extraClass?: string;
 }
 
 const FOCUSABLE = 'button:not([disabled]), [href], input, [tabindex]:not([tabindex="-1"])';
 
 /** Accessible dialog: focuses its first control, traps Tab, restores focus when closed. */
-export function Modal({ title, icon, children, onClose, variant = 'default', layer = 0 }: Props) {
+export function Modal({
+  title,
+  icon,
+  children,
+  onClose,
+  variant = 'default',
+  layer = 0,
+  behind = 0,
+  extraClass = '',
+}: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
 
@@ -51,31 +64,37 @@ export function Modal({ title, icon, children, onClose, variant = 'default', lay
 
   return (
     <div class="modal-backdrop" style={{ zIndex: 100 + layer }}>
-      <div
-        ref={ref}
-        class={`modal modal--${variant}`}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        onKeyDown={onKeyDown}
-      >
-        <div class="modal__header">
-          {icon && (
-            <span class="modal__icon" aria-hidden="true">
-              {icon}
-            </span>
-          )}
-          <h2 id={titleId} class="modal__title">
-            {title}
-          </h2>
-          {onClose && (
-            <button class="modal__close" onClick={onClose} aria-label="Close">
-              ✕
-            </button>
-          )}
+      <div class="modal-stack">
+        {/* Decorative only: not dialogs, so nothing (bots included) mistakes them for one. */}
+        {Array.from({ length: Math.min(behind, 3) }, (_, i) => (
+          <div key={i} class="modal-ghost" style={{ '--i': i + 1 }} aria-hidden="true" />
+        ))}
+        <div
+          ref={ref}
+          class={`modal modal--${variant}${extraClass ? ` ${extraClass}` : ''}`}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+          onKeyDown={onKeyDown}
+        >
+          <div class="modal__header">
+            {icon && (
+              <span class="modal__icon" aria-hidden="true">
+                {icon}
+              </span>
+            )}
+            <h2 id={titleId} class="modal__title">
+              {title}
+            </h2>
+            {onClose && (
+              <button class="modal__close" onClick={onClose} aria-label="Close">
+                ✕
+              </button>
+            )}
+          </div>
+          {children}
         </div>
-        {children}
       </div>
     </div>
   );

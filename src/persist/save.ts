@@ -9,6 +9,9 @@ export interface SaveData {
   zenUnlocked: boolean;
   zenLifetime: number;
   muted: boolean;
+  /** Master volume, 0 to 1. */
+  volume: number;
+  music: boolean;
 }
 
 export const SAVE_KEY = 'clear-all/save';
@@ -24,6 +27,8 @@ export function defaults(): SaveData {
     zenUnlocked: false,
     zenLifetime: 0,
     muted: false,
+    volume: 0.8,
+    music: true,
   };
 }
 
@@ -40,7 +45,8 @@ export function load(): SaveData {
     const raw = storage()?.getItem(SAVE_KEY);
     if (!raw) return defaults();
     const parsed = JSON.parse(raw) as Partial<SaveData>;
-    // Unknown versions start fresh rather than misreading fields.
+    // Unknown versions start fresh rather than misreading fields. Fields added later within v1
+    // (volume, music) are filled from defaults.
     if (parsed.v !== 1) return defaults();
     return { ...defaults(), ...parsed };
   } catch {

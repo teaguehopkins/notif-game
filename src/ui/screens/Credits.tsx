@@ -3,6 +3,7 @@ import { FINALE_CREDITS } from '../../content/finale';
 import { Badge } from '../components/Badge';
 import { FocusButton } from '../components/FocusButton';
 import { game, useEngine } from '../game';
+import { fx } from '../fx';
 import { prefersReducedMotion } from '../motion';
 
 const CREDITS: [string, string[]][] = [
@@ -52,7 +53,13 @@ function CreditsRoll() {
         ))}
       </div>
       {ended && (
-        <FocusButton class="credits__dot" onClick={() => game.clear(FINALE_CREDITS)}>
+        <FocusButton
+          class="credits__dot"
+          onClick={() => {
+            fx.confetti(fx.origin(), 90);
+            game.clear(FINALE_CREDITS);
+          }}
+        >
           1 New Notification
           <Badge count={1} />
         </FocusButton>

@@ -5,7 +5,9 @@ describe('share', () => {
   test('formats the share line', () => {
     expect(formatTime(402_000)).toBe('6:42');
     expect(formatTime(5_000)).toBe('0:05');
-    expect(shareLine(214, 402_000)).toBe('I cleared 214 notifications in 6:42 in Legends of Loot 🔴');
+    expect(shareLine(214, 402_000)).toBe(
+      'I cleared 214 notifications in 6:42 in Legends of Loot 🔴',
+    );
   });
 
   test('uses Web Share when native sharing is preferred', async () => {
@@ -31,6 +33,24 @@ describe('share', () => {
     expect(await shareResult('t', 'u', { share, clipboard: { writeText } }, true)).toBe('copied');
     expect(writeText).toHaveBeenCalledWith('t u');
     expect(await shareResult('t', 'u', { share, clipboard: { writeText } }, false)).toBe('copied');
+  });
+
+  test('shares the result image when the browser can share files', async () => {
+    const image = new File(['png'], 'card.png', { type: 'image/png' });
+    const share = vi.fn().mockResolvedValue(undefined);
+    const canShare = vi.fn().mockReturnValue(true);
+    expect(await shareResult('t', 'u', { share, canShare }, true, image)).toBe('shared');
+    expect(canShare).toHaveBeenCalledWith({ files: [image] });
+    expect(share).toHaveBeenCalledWith({ files: [image], text: 't', url: 'u' });
+  });
+
+  test('shares text only when files are not shareable, or there is no canShare', async () => {
+    const image = new File(['png'], 'card.png', { type: 'image/png' });
+    const share = vi.fn().mockResolvedValue(undefined);
+    await shareResult('t', 'u', { share, canShare: () => false }, true, image);
+    await shareResult('t', 'u', { share }, true, image);
+    expect(share).toHaveBeenNthCalledWith(1, { text: 't', url: 'u' });
+    expect(share).toHaveBeenNthCalledWith(2, { text: 't', url: 'u' });
   });
 
   test('asks for manual copy when nothing else works', async () => {

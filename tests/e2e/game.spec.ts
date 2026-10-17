@@ -33,6 +33,10 @@ test('full run reaches Inbox Zero, credits, and results', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'You Cleared All Notifications' })).toBeVisible();
   const cleared = Number(await page.locator('.results__stats div:nth-child(2) dd').innerText());
   expect(cleared).toBeGreaterThanOrEqual(150);
+  // The share image is drawn up front and actually renders.
+  const card = page.getByRole('img', { name: /^Result card: \d+ notifications cleared/ });
+  await expect(card).toBeVisible();
+  expect(await card.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(1080);
   // The save remembers it, and Zen is unlocked on the title screen.
   await page.reload();
   await expect(page.getByRole('button', { name: /Zen Mode/ })).toBeVisible({ timeout: 8000 });
@@ -138,4 +142,14 @@ test('no axe violations on home, a menu, and a popup', async ({ page }) => {
   await page.getByRole('button', { name: /^.*Achievements/ }).click();
   await page.waitForTimeout(400);
   await scan('menu');
+});
+
+test('the hidden sound check page lists every sound and plays without errors', async ({ page }) => {
+  await page.goto('/?sfx');
+  await expect(page.getByRole('heading', { name: 'Sound check' })).toBeVisible();
+  const buttons = page.locator('.sfx-lab__grid button');
+  expect(await buttons.count()).toBeGreaterThan(30);
+  for (const name of ['Legendary', 'Sad trombone (duplicate)', 'launcher', 'off']) {
+    await page.getByRole('button', { name, exact: true }).click();
+  }
 });

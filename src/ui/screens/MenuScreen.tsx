@@ -1,10 +1,39 @@
 import { findNode } from '../../content/nav';
 import type { Instance } from '../../engine/types';
 import { Badge, NewPill } from '../components/Badge';
+import { CardBack, CardFace, backVariant, cardName } from '../components/Cards';
 import { formatRewards } from '../components/NotifModal';
 import { game, useEngine } from '../game';
 import { isHinted } from './Home';
 import { SpecialPanel } from './SpecialPanels';
+
+/** Cards, card backs and avatars show art instead of an emoji. */
+function ItemArt({ inst }: { inst: Instance }) {
+  const def = inst.def;
+  if (def.at === 'collection/cards')
+    return (
+      <CardFace
+        small
+        name={cardName(inst.title)}
+        icon={def.icon}
+        rarity={def.rarity}
+        text={inst.body}
+      />
+    );
+  if (def.at === 'collection/cardBacks')
+    return <CardBack small variant={backVariant(inst.title)} />;
+  if (def.at === 'collection/avatars')
+    return (
+      <span class="avatar-frame" aria-hidden="true">
+        {def.icon ?? '🧙'}
+      </span>
+    );
+  return (
+    <span class="item-card__icon" aria-hidden="true">
+      {def.icon ?? '•'}
+    </span>
+  );
+}
 
 function ItemCard({ inst, active }: { inst: Instance; active: boolean }) {
   useEngine();
@@ -21,14 +50,12 @@ function ItemCard({ inst, active }: { inst: Instance; active: boolean }) {
   return (
     <li>
       <button
-        class={`item-card${active ? ' item-card--new' : ' item-card--seen'}${def.kind === 'achievement' ? ' item-card--ach' : ''}${active && isHinted(def.at ?? '') ? ' hinted' : ''}`}
+        class={`item-card${active ? ' item-card--new' : ' item-card--seen'}${def.kind === 'achievement' ? ' item-card--ach' : ''}${def.rarity === 'legendary' ? ' item-card--legendary' : ''}${active && isHinted(def.at ?? '') ? ' hinted' : ''}`}
         onClick={open}
         // Seen cards are just a record; keep them out of the Tab order.
         disabled={!active}
       >
-        <span class="item-card__icon" aria-hidden="true">
-          {def.icon ?? '•'}
-        </span>
+        <ItemArt inst={inst} />
         <span class="item-card__text">
           <span class="item-card__title">{inst.title}</span>
           {inst.body && <span class="item-card__body">{inst.body}</span>}

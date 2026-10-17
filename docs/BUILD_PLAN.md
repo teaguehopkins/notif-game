@@ -18,6 +18,7 @@ See [PRD.md](PRD.md) for the product spec; section references (§) point there.
 | M9 Share                     | ✅                                                                                                                                                                               |
 | M10 Mobile and accessibility | ✅ full keyboard-only run and full touch-profile run at 375×667 (e2e); axe clean on home, menu, popup; Lighthouse mobile 100/100/100 (perf/a11y/best practices, title screen)    |
 | M11 Polish and deploy        | ✅ live at https://teaguehopkins.github.io/notif-game/ (Pages workflow on push to main); v1.0.0 release has the itch.io zip                                                      |
+| Pizzazz pass                 | ✅ sounds, music, card art, particles, Inbox Zero moment, share image ([todo.md](../todo.md)); `?sfx` sound check                                                                |
 
 ## Project layout (as built)
 
@@ -27,14 +28,22 @@ src/
             rng.ts (seeded) · zen.ts (zen director)
   content/  nav.ts (launcher menu tree) · helpers.ts · acts/act0-boot.ts … act4-convergence.ts
             finale.ts · zen.ts (zen templates + milestones) · index.ts
-  ui/       App.tsx · game.ts (controller + signals) · motion.ts
-            components/ (Badge, Modal, NotifModal + interactions, ModalHost, TopBar, Toasts)
+  ui/       App.tsx · game.ts (controller + signals) · fx.ts (particles, shake, haptics) · motion.ts
+            components/ (Badge, Modal, NotifModal + interactions, ModalHost, TopBar, Toasts,
+            FxLayer, Ambience, Backdrop, Cards, Crest, CurrencyIcon, Rolling)
             screens/ (Title, Home, MenuScreen, SpecialPanels, Credits, Results)
-  audio/sfx.ts · persist/save.ts · share/share.ts · styles/app.css
-tests/      engine · simulate · content · zen · save · share (Vitest)
+  audio/    sfx.ts (synth + every sound effect) · music.ts (generative music sequencer)
+  share/    share.ts · card.ts (result card PNG)   persist/save.ts · styles/app.css
+  dev/      SfxLab.tsx (hidden sound check at ?sfx, lazy-loaded)
+tests/      engine · simulate · content · zen · save · share · audio · cards (Vitest)
             sim-report.test.ts (SIM_REPORT=1 pacing report) · e2e/ (Playwright: smoke, full run,
-            Mark All, zen, keyboard-only full run, axe; desktop + 375×667 phone)
+            Mark All, zen, keyboard-only full run, axe, sound check; desktop + 375×667 phone)
 ```
+
+**Effects rules:** everything decorative goes through `fx` (canvas particles, shakes via the
+`translate`/`rotate` properties, never a transform on the page) or `Ambience` (CSS layers), takes
+no pointer events, and does nothing under `prefers-reduced-motion`. Sound routes through one master
+gain, so mute and volume apply to notes already scheduled.
 
 **Gotcha:** `@preact/signals` memoizes any component that reads a signal, so it skips re-renders
 from its parent when its props are unchanged. Every component that reads engine state must call

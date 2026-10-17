@@ -55,7 +55,11 @@ export interface NotifDef {
   rewards?: Record<string, number>;
   /** Phase this can spawn in. Defaults to 'main'. */
   phase?: Phase;
+  /** Cosmetic: card frames, reveal stingers, and the occasional legendary notification. */
+  rarity?: Rarity;
 }
+
+export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 export interface Instance {
   def: NotifDef;

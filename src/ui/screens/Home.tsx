@@ -1,5 +1,7 @@
 import type { NavNode } from '../../content/nav';
+import { Backdrop } from '../components/Backdrop';
 import { Badge } from '../components/Badge';
+import { Crest } from '../components/Crest';
 import { game, useEngine } from '../game';
 
 function isHinted(path: string): boolean {
@@ -24,9 +26,13 @@ function MenuTile({ node }: { node: NavNode }) {
 }
 
 export function Home() {
-  const playCount = useEngine().countUnder('play');
+  const e = useEngine();
+  const playCount = e.countUnder('play');
+  const zen = game.screen.value === 'zen';
   return (
     <main class="home">
+      <Backdrop clutter={zen ? 0.2 : Math.min(e.activeCount / 40, 1)} />
+      <Crest size={64} />
       <h1 class="logo">
         <span class="logo__top">Legends</span>
         <span class="logo__of">of</span>

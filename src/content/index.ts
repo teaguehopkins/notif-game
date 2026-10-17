@@ -20,4 +20,5 @@ export const OPTIONAL_EVENTS = [
   'touchedPrefs',
   'setAvatar',
   'returnVisit',
+  'adjustedVolume',
 ];

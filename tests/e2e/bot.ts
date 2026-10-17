@@ -81,11 +81,19 @@ export async function freshStart(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Start' }).click({ timeout: 8000 });
 }
 
-/** Presses Tab until `target` has focus. Throws if it can't get there, which is the bug. */
+/**
+ * Presses Tab until `target` has focus. Throws if it can't get there, which is the bug, unless a
+ * popup arrived mid-way and trapped focus (a race, not a bug: the next step handles the popup).
+ */
 async function tabTo(page: Page, target: Locator, max = 80): Promise<void> {
   const handle = await target.elementHandle();
   for (let i = 0; i < max; i++) {
     if (await page.evaluate((el) => el === document.activeElement, handle)) return;
+    const interrupted = await page.evaluate((el) => {
+      const dialog = [...document.querySelectorAll('[aria-modal="true"]')].pop();
+      return !!dialog && !!el && !dialog.contains(el);
+    }, handle);
+    if (interrupted) throw new Error('interrupted by a popup');
     await page.keyboard.press('Tab');
   }
   throw new Error(`could not Tab to ${await target.evaluate((el) => el.outerHTML.slice(0, 80))}`);

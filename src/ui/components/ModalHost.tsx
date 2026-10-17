@@ -17,7 +17,8 @@ function contentsOf(id: string): NotifDef[] {
 /** Item modal underneath, popups on top: popups interrupt whatever you were doing. */
 export function ModalHost() {
   const e = useEngine();
-  const popup = e.popups()[0];
+  const popups = e.popups();
+  const popup = popups[0];
   const openId = game.openItem.value;
   const item = openId ? e.get(openId) : undefined;
   const mm = game.matchmaking.value;
@@ -65,6 +66,7 @@ export function ModalHost() {
           onClear={(o) => game.clear(popup.def.id, o)}
           onSnooze={() => game.snooze(popup.def.id)}
           layer={2}
+          behind={popups.length - 1}
         />
       )}
     </>

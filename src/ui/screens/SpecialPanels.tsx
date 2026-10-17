@@ -22,7 +22,25 @@ export function SpecialPanel({ path }: { path: string }) {
         <div class="panel">
           <label class="toggle">
             <input type="checkbox" checked={!game.muted.value} onChange={() => game.toggleMute()} />
-            <span>Sound effects</span>
+            <span>Sound</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" checked={game.music.value} onChange={() => game.toggleMusic()} />
+            <span>Music</span>
+          </label>
+          <label class="slider">
+            <span>Volume</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={Math.round(game.volume.value * 100)}
+              onInput={(e) => game.setVolume(Number((e.target as HTMLInputElement).value) / 100)}
+            />
+            <span class="slider__value" aria-hidden="true">
+              {Math.round(game.volume.value * 100)}
+            </span>
           </label>
         </div>
       );
@@ -33,12 +51,12 @@ export function SpecialPanel({ path }: { path: string }) {
         <div class="panel">
           <p class="panel__label">Choose your avatar</p>
           <div class="avatar-picker" role="radiogroup" aria-label="Avatar">
-            {AVATARS.map((a) => (
+            {AVATARS.map((a, i) => (
               <button
                 key={a}
                 role="radio"
                 aria-checked={game.avatar.value === a}
-                class={game.avatar.value === a ? 'avatar avatar--on' : 'avatar'}
+                class={`avatar avatar--f${i % 4}${game.avatar.value === a ? ' avatar--on' : ''}`}
                 onClick={() => game.setAvatar(a)}
               >
                 {a}

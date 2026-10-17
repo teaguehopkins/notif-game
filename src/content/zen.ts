@@ -1,5 +1,5 @@
 import { pick } from '../engine/rng';
-import type { ContentPack, NotifDef } from '../engine/types';
+import type { ContentPack, NotifDef, Rarity } from '../engine/types';
 import type { ZenTemplate } from '../engine/zen';
 
 const ADJ = [
@@ -53,14 +53,37 @@ const PATCH = [
 ];
 
 const name = (rng: () => number) => `${pick(rng, ADJ)} ${pick(rng, NOUN)}`;
+const CARD_ICONS = ['👺', '🐉', '🧌', '🦉', '🗿', '🧚', '🐸', '🦀', '🍄', '👻'];
+// Weighted by repetition: mostly commons, like a real pack.
+const CARD_RARITIES: Rarity[] = [
+  'common',
+  'common',
+  'common',
+  'common',
+  'rare',
+  'rare',
+  'epic',
+  'legendary',
+];
 
 export const zenTemplates: ZenTemplate[] = [
   (rng) => ({
     kind: 'item',
     at: 'collection/cards',
     title: `NEW: ${name(rng)}`,
-    icon: '🃏',
+    icon: pick(rng, CARD_ICONS),
     interaction: 'view',
+    rarity: pick(rng, CARD_RARITIES),
+  }),
+  () => ({
+    kind: 'item',
+    at: 'mail',
+    title: 'LEGENDARY NOTIFICATION',
+    body: 'Astonishingly rare. Contains nothing.',
+    icon: '🌟',
+    rarity: 'legendary',
+    interaction: 'dismiss',
+    cta: 'Incredible',
   }),
   (rng) => ({
     kind: 'item',

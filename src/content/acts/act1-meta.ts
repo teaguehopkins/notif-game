@@ -191,4 +191,11 @@ export const act1: NotifDef[] = [
     'You changed your avatar. Your friends will be notified.',
     on('setAvatar'),
   ),
+  ach(
+    'ach_volume',
+    'secret',
+    'Adjusted the Volume',
+    'You found the volume slider. It goes to 100. We checked.',
+    on('adjustedVolume'),
+  ),
 ];

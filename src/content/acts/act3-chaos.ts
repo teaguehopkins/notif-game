@@ -340,4 +340,26 @@ export const act3: NotifDef[] = [
     interaction: 'tinyX',
     body: 'Watch one short ad to double the reward you got from your last notification!',
   }),
+
+  // Legendary notifications: gold borders, sparkles, nothing inside.
+  item('legend_mail', 'mail', 'LEGENDARY NOTIFICATION', stat('cleared', 45), {
+    icon: '🌟',
+    rarity: 'legendary',
+    interaction: 'dismiss',
+    body: 'An extremely rare notification. 0.01% drop rate.\n\nIt contains nothing.',
+    cta: 'Incredible',
+  }),
+  popup('legend_popup', 'LEGENDARY NOTIFICATION', stat('cleared', 110), {
+    icon: '🌟',
+    rarity: 'legendary',
+    body: 'You found another one! It also contains nothing. Two in one run. The odds are astronomical.',
+    cta: 'Wow',
+  }),
+  ach(
+    'ach_legendary',
+    'progress',
+    'Legendary Collector',
+    'You collected 2 legendary notifications. Their combined value is zero.',
+    afterAll('legend_mail', 'legend_popup'),
+  ),
 ];
