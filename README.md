@@ -4,6 +4,8 @@ A satirical browser game about clearing notifications. You open **Legends of Loo
 game you never get to play, and every menu has a red dot. Clearing one unlocks an achievement, and
 every achievement is another red dot. Reach Inbox Zero and you get one more.
 
+**Play it:** https://teaguehopkins.github.io/notif-game/
+
 - [Product requirements](docs/PRD.md)
 - [Build plan and status](docs/BUILD_PLAN.md)
 
