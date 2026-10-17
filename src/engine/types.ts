@@ -25,8 +25,8 @@ export type Phase = 'main' | 'finale' | 'done' | 'zen';
 
 export type Trigger =
   | { on: 'start' }
-  /** Fires when `id` is cleared, optionally only for a specific outcome. */
-  | { on: 'cleared'; id: string; outcome?: string }
+  /** Fires when `id` is cleared, optionally only for specific outcome(s). */
+  | { on: 'cleared'; id: string; outcome?: string | string[] }
   | { on: 'allCleared'; ids: string[] }
   | { on: 'anyCleared'; ids: string[] }
   | { on: 'stat'; stat: string; gte: number }

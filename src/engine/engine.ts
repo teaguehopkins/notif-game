@@ -6,6 +6,12 @@ export const XP_PER_LEVEL = 100;
 
 export type Mode = 'story' | 'zen';
 
+/** Outcomes the UI can clear a def with: its listed choices, or ones implied by its interaction. */
+export function outcomesOf(def: NotifDef): string[] {
+  if (def.interaction === 'tinyX') return ['ad', 'x'];
+  return def.outcomes ?? [];
+}
+
 interface Pending {
   def: NotifDef;
   at: number;
@@ -87,6 +93,10 @@ export class Engine {
 
   get(id: string): Instance | undefined {
     return this.active.get(id);
+  }
+
+  firedIds(): string[] {
+    return [...this.fired];
   }
 
   hasFired(id: string): boolean {
@@ -288,10 +298,9 @@ export class Engine {
       case 'start':
         return this.events.has('start');
       case 'cleared':
-        return (
-          this.clearedOutcomes.has(t.id) &&
-          (t.outcome === undefined || this.clearedOutcomes.get(t.id) === t.outcome)
-        );
+        if (!this.clearedOutcomes.has(t.id)) return false;
+        if (t.outcome === undefined) return true;
+        return [t.outcome].flat().includes(this.clearedOutcomes.get(t.id) ?? '');
       case 'allCleared':
         return t.ids.every((id) => this.clearedOutcomes.has(id));
       case 'anyCleared':

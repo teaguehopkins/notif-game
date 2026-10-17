@@ -1,4 +1,4 @@
-import { Engine, MAX_SNOOZES } from './engine';
+import { Engine, MAX_SNOOZES, outcomesOf } from './engine';
 import { createRng, pick } from './rng';
 import type { ContentPack, Instance } from './types';
 
@@ -24,6 +24,8 @@ export interface SimResult {
   zeroAtMs: number;
   inboxZeroCount: number;
   usedMarkAll: boolean;
+  /** Every def id that spawned (or was scheduled) during the run. */
+  fired: string[];
   violations: string[];
 }
 
@@ -97,7 +99,8 @@ export function simulate(pack: ContentPack, opts: SimOptions): SimResult {
       engine.snooze(inst.def.id);
       continue;
     }
-    const outcome = inst.def.outcomes?.length ? pick(rng, inst.def.outcomes) : undefined;
+    const outcomes = outcomesOf(inst.def);
+    const outcome = outcomes.length ? pick(rng, outcomes) : undefined;
     if (!engine.clear(inst.def.id, outcome)) {
       // Visiting may have put a popup in front; that's fine, try again next step.
       if (engine.clearable().includes(inst)) violations.push(`could not clear "${inst.def.id}"`);
@@ -117,6 +120,7 @@ export function simulate(pack: ContentPack, opts: SimOptions): SimResult {
     zeroAtMs,
     inboxZeroCount,
     usedMarkAll: engine.hasEvent('usedMarkAll'),
+    fired: engine.firedIds(),
     violations,
   };
 }
