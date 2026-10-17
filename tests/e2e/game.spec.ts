@@ -72,6 +72,16 @@ test('a refresh mid-run continues where it left off, and the run still finishes'
   expect(await page.evaluate(() => localStorage.getItem('clear-all/run'))).toBeNull();
 });
 
+test('a refresh during the credits continues to the results', async ({ page }) => {
+  await freshStart(page);
+  await playUntil(page, async () => (await page.locator('.credits').count()) > 0);
+  await page.reload();
+  await page.getByRole('button', { name: /^Continue/ }).click({ timeout: 8000 });
+  await expect(page.locator('.credits')).toBeVisible();
+  await playUntil(page, async () => (await page.locator('.results').count()) > 0);
+  await expect(page.getByRole('heading', { name: 'You Cleared All Notifications' })).toBeVisible();
+});
+
 test('Mark All As Read clears everything and spawns the FOMO popup', async ({ page }) => {
   await freshStart(page);
   const markAll = page.getByRole('button', { name: /Mark All As Read/ });

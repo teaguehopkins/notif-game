@@ -107,6 +107,12 @@ class Game {
     setMuted(this.muted.value);
     setVolume(this.volume.value);
     setMusicEnabled(this.music.value);
+    // A run saved before a content change may not restore; don't offer to continue it.
+    const run = this.savedRun.value;
+    if (run && !Engine.restore(story, run.engine)) {
+      clearRun();
+      this.savedRun.value = null;
+    }
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
