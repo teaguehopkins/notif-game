@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { MAX_SNOOZES } from '../../engine/engine';
 import type { Instance, NotifDef } from '../../engine/types';
@@ -86,6 +87,18 @@ function Interaction(p: InteractionProps) {
   }
 }
 
+/** Focuses a button that appears mid-interaction, so keyboard focus isn't dropped. */
+function useFocusOnMount<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => ref.current?.focus(), []);
+  return ref;
+}
+
+function FocusButton(props: ComponentProps<'button'>) {
+  const ref = useFocusOnMount<HTMLButtonElement>();
+  return <button ref={ref} {...props} />;
+}
+
 function Body({ text }: { text: string }) {
   return text ? <p class="modal__body">{text}</p> : null;
 }
@@ -128,7 +141,7 @@ function Choice({ inst, onClear }: InteractionProps) {
             key={o}
             class={i === 0 && !stars ? 'btn btn--gold' : 'btn'}
             onClick={() => onClear(o)}
-            aria-label={stars ? `${o.length - 1} stars` : undefined}
+            aria-label={stars ? `${parseInt(o, 10)} stars` : undefined}
           >
             {o}
           </button>
@@ -213,9 +226,9 @@ function Chest({ inst, onClear }: InteractionProps) {
       {state === 'open' && <Rewards def={inst.def} />}
       <div class="modal__actions">
         {state === 'open' ? (
-          <button class="btn btn--gold" onClick={() => onClear()}>
+          <FocusButton class="btn btn--gold" onClick={() => onClear()}>
             Collect
-          </button>
+          </FocusButton>
         ) : (
           <button class="btn btn--gold" disabled={state === 'opening'} onClick={open}>
             {inst.def.cta ?? 'Open'}
@@ -266,9 +279,9 @@ function Pack({ inst, onClear, contents }: InteractionProps) {
       )}
       <div class="modal__actions">
         {done ? (
-          <button class="btn btn--gold" onClick={() => onClear()}>
+          <FocusButton class="btn btn--gold" onClick={() => onClear()}>
             Done
-          </button>
+          </FocusButton>
         ) : (
           <button class="btn btn--gold" disabled={opening} onClick={() => setRevealed(0)}>
             {inst.def.cta ?? 'Open'}
@@ -319,9 +332,15 @@ function TinyX({ inst, onClear }: InteractionProps) {
           <div class="fake-ad__stars">★★★★★ "I get so many notifications now" (Gary)</div>
         </div>
         <div class="modal__actions">
-          <button class="btn btn--gold" disabled={ad > 0} onClick={() => onClear('ad')}>
-            {ad > 0 ? `Reward in ${ad}…` : 'Claim Reward'}
-          </button>
+          {ad > 0 ? (
+            <button class="btn btn--gold" disabled>
+              Reward in {ad}…
+            </button>
+          ) : (
+            <FocusButton class="btn btn--gold" onClick={() => onClear('ad')}>
+              Claim Reward
+            </FocusButton>
+          )}
         </div>
       </>
     );
@@ -439,14 +458,14 @@ function Confirm({ inst, onClear }: InteractionProps) {
             <button class="btn" onClick={() => setAsking(false)}>
               No, Keep It
             </button>
-            <button class="btn btn--gold" onClick={() => onClear()}>
+            <FocusButton class="btn btn--gold" onClick={() => onClear()}>
               Yes, Dismiss
-            </button>
+            </FocusButton>
           </>
         ) : (
-          <button class="btn btn--gold" onClick={() => setAsking(true)}>
+          <FocusButton class="btn btn--gold" onClick={() => setAsking(true)}>
             {inst.def.cta ?? 'Dismiss'}
-          </button>
+          </FocusButton>
         )}
       </div>
     </>

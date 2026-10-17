@@ -2,20 +2,43 @@
 
 See [PRD.md](PRD.md) for the product spec; section references (§) point there.
 
-## Project layout
+## Status (2026-10-17)
+
+| Milestone                    | Status                                                                                                                                                                           |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0 Scaffold                  | ✅                                                                                                                                                                               |
+| M1 Engine, bubbling, sim bot | ✅                                                                                                                                                                               |
+| M2 Launcher shell            | ✅                                                                                                                                                                               |
+| M3 Interaction types         | ✅ all 10, exercised by the browser bot                                                                                                                                          |
+| M4 Authored content          | ✅ 191 notifications; 500-seed sim: 159–179 clears, every def reachable. Bot peak is ~31 active (the random bot clears faster than a person navigates, so real peaks run higher) |
+| M5 Finale, credits, results  | ✅                                                                                                                                                                               |
+| M6 Zen mode                  | ✅                                                                                                                                                                               |
+| M7 Sound                     | ✅ synthesized WebAudio; not yet tuned by ear                                                                                                                                    |
+| M8 Persistence               | ✅                                                                                                                                                                               |
+| M9 Share                     | ✅                                                                                                                                                                               |
+| M10 Mobile and accessibility | ✅ phone layout, keyboard-only boot flow e2e; Lighthouse not yet run                                                                                                             |
+| M11 Polish and deploy        | 🟡 Playwright suite done; hosting not set up yet                                                                                                                                 |
+
+## Project layout (as built)
 
 ```
 src/
-  engine/   types.ts · engine.ts (state, clear(), events) · triggers.ts · badges.ts (derived counts)
-            rng.ts (seeded) · zen.ts (generator) · stats.ts
-  content/  nav.ts (launcher nav tree) · acts/act0-boot.ts … act4-convergence.ts · finale.ts
-            templates.ts (shared factories, e.g. makePack(), makeLevelUp()) · zenTemplates.ts · index.ts
-  ui/       App.tsx · Launcher.tsx · HUD.tsx · screens/* (Shop, Collection, Mail, Quests, Pass, Friends,
-            Achievements, Event, Settings, Profile) · components/ (Badge, NewPill, Modal, ModalStack,
-            Toast, Chest, PackOpen, ScrollGate, DodgeX, HoldButton) · Credits.tsx · Results.tsx
-  audio/sfx.ts  · persist/save.ts · share/share.ts · styles/ (tokens.css, launcher.css)
-tests/      engine.test.ts · badges.test.ts · content.test.ts · simulate.test.ts · e2e/smoke.spec.ts
+  engine/   types.ts · engine.ts (cascade, derived badge counts) · simulate.ts (random-order bot)
+            rng.ts (seeded) · zen.ts (zen director)
+  content/  nav.ts (launcher menu tree) · helpers.ts · acts/act0-boot.ts … act4-convergence.ts
+            finale.ts · zen.ts (zen templates + milestones) · index.ts
+  ui/       App.tsx · game.ts (controller + signals) · motion.ts
+            components/ (Badge, Modal, NotifModal + interactions, ModalHost, TopBar, Toasts)
+            screens/ (Title, Home, MenuScreen, SpecialPanels, Credits, Results)
+  audio/sfx.ts · persist/save.ts · share/share.ts · styles/app.css
+tests/      engine · simulate · content · zen · save · share (Vitest)
+            sim-report.test.ts (SIM_REPORT=1 pacing report) · e2e/ (Playwright: smoke, full run,
+            Mark All, zen, keyboard-only; desktop + phone)
 ```
+
+**Gotcha:** `@preact/signals` memoizes any component that reads a signal, so it skips re-renders
+from its parent when its props are unchanged. Every component that reads engine state must call
+`useEngine()` itself.
 
 ## Milestones and acceptance criteria
 
