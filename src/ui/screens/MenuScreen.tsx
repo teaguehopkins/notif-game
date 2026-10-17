@@ -7,6 +7,7 @@ import { isHinted } from './Home';
 import { SpecialPanel } from './SpecialPanels';
 
 function ItemCard({ inst, active }: { inst: Instance; active: boolean }) {
+  useEngine();
   const def = inst.def;
   const view = !def.interaction || def.interaction === 'view';
   const open = () => {

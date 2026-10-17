@@ -8,7 +8,7 @@ function isHinted(path: string): boolean {
 }
 
 function MenuTile({ node }: { node: NavNode }) {
-  const count = game.engine.countUnder(node.id);
+  const count = useEngine().countUnder(node.id);
   return (
     <button
       class={`menu-tile${isHinted(node.id) ? ' hinted' : ''}${node.revealedBy ? ' menu-tile--event' : ''}`}
@@ -24,8 +24,7 @@ function MenuTile({ node }: { node: NavNode }) {
 }
 
 export function Home() {
-  useEngine();
-  const playCount = game.engine.countUnder('play');
+  const playCount = useEngine().countUnder('play');
   return (
     <main class="home">
       <h1 class="logo">

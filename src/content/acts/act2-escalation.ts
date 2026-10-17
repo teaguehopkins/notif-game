@@ -38,7 +38,7 @@ export const act2: NotifDef[] = [
   item('shop_freepack', 'shop/packs', 'Free Pack!', after('shop_afford'), {
     icon: '📦',
     interaction: 'pack',
-    body: 'Contains 5 cards, at least one of which is a card.',
+    body: 'Contains 5 cards. Results may vary.',
     rewards: { xp: 50 },
     cta: 'Open Pack',
   }),

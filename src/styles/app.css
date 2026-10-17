@@ -775,6 +775,7 @@ button {
 }
 .tiny-x {
   position: absolute;
+  z-index: 2;
   top: 6px;
   right: 6px;
   width: 18px;

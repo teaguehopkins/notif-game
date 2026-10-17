@@ -16,8 +16,7 @@ function contentsOf(id: string): NotifDef[] {
 
 /** Item modal underneath, popups on top: popups interrupt whatever you were doing. */
 export function ModalHost() {
-  useEngine();
-  const e = game.engine;
+  const e = useEngine();
   const popup = e.popups()[0];
   const openId = game.openItem.value;
   const item = openId ? e.get(openId) : undefined;

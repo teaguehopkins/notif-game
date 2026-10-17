@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { formatTime } from '../../share/share';
-import { game } from '../game';
+import { game, useEngine } from '../game';
 
 const PREFS = [
   'Notify me about notifications',
@@ -15,6 +15,7 @@ const AVATARS = ['🧙', '🧝', '🧛', '🧟', '🦹', '🤴', '🐸'];
 
 /** Non-notification furniture for some screens, so menus feel like real menus. */
 export function SpecialPanel({ path }: { path: string }) {
+  const engine = useEngine();
   switch (path) {
     case 'settings/audio':
       return (
@@ -64,8 +65,8 @@ export function SpecialPanel({ path }: { path: string }) {
       if (path.startsWith('achievements/')) {
         return (
           <div class="panel panel--ach">
-            🏆 {game.engine.stats.achievements ?? 0} achievements unlocked · Achievement points:{' '}
-            {(game.engine.stats.achievements ?? 0) * 10}
+            🏆 {engine.stats.achievements ?? 0} achievements unlocked · Achievement points:{' '}
+            {(engine.stats.achievements ?? 0) * 10}
           </div>
         );
       }
