@@ -1,8 +1,8 @@
-# Clear All: Product Requirements
+# Legends of Loot: Product Requirements
 
 ## 1. Pitch
 
-**Working title:** _Clear All_. Inside the fiction, the launcher belongs to a made-up F2P game called **"Legends of Loot"**. You open the game and never get to play it. Every button has a red dot. Every dot leads to a menu, and every menu has more dots. Clearing one earns _"Achievement: You Cleared a Notification!"_, which is itself a notification. The goal is Inbox Zero.
+**Title:** _Legends of Loot_, which is also the made-up F2P game whose launcher you are stuck in, by "Legends of Loot Interactive". You open the game and never get to play it. Every button has a red dot. Every dot leads to a menu, and every menu has more dots. Clearing one earns _"Achievement: You Cleared a Notification!"_, which is itself a notification. The goal is Inbox Zero.
 
 ## 2. Goals and non-goals
 
@@ -118,7 +118,7 @@ Target: **150–250 clears** in 5–10 minutes. That assumes about 2–3 seconds
 
 - **Sound:** synthesized with WebAudio (no assets, so no licensing). Sounds include a ding whose pitch rises with fast-clear combos, a chest fanfare, coins, and an increasingly insistent ping when new dots spawn. The AudioContext starts only on the first user gesture. A global mute toggle unlocks _Muted Us_.
 - **Persistence:** localStorage with a versioned schema `{ v, lifetimeCleared, runsCompleted, bestTimeMs, bestCleared, zenUnlocked, zenLifetime, metaAchievements[], muted }`. Every read and write is wrapped in try/catch, and the game works the same when storage is unavailable. There is no mid-run save in v1.
-- **Share:** a results line such as `"I cleared 214 notifications in 6:42 in Clear All 🔴 <url>"`. It uses `navigator.share` on mobile, then `navigator.clipboard`, then a select-the-text fallback. Sharing unlocks _Spread the Word_, a post-game notification.
+- **Share:** a results line such as `"I cleared 214 notifications in 6:42 in Legends of Loot 🔴 <url>"`. It uses `navigator.share` on mobile, then `navigator.clipboard`, then a select-the-text fallback. Sharing unlocks _Spread the Word_, a post-game notification.
 - **Mobile:** a responsive layout with a bottom tab bar on narrow screens and touch targets of at least 44px. Nothing depends on hover. Modals fill the screen on phones.
 
 ## 8. Accessibility
@@ -142,7 +142,7 @@ Target: **150–250 clears** in 5–10 minutes. That assumes about 2–3 seconds
 
 ## 11. Open questions / defaults chosen
 
-- **Name:** _Clear All_, with the fictional launcher game "Legends of Loot". Easy to change.
+- **Name:** _Legends of Loot_ (renamed from the working title _Clear All_). The save key `clear-all/save` keeps the old name so saves survive.
 - **Hosting:** GitHub Pages by default, with an itch.io zip as a secondary option.
 - **Art:** CSS, SVG, and emoji only, with no image assets in v1. The look is a gold-and-wood gradient UI with chunky buttons and a lot of glow.
 - **Hint system:** after 20 seconds with no clear, the deepest unseen dot pulses and the parent chain glows. Using it unlocks _"Needed a Hint"_.

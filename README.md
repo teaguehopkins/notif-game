@@ -1,4 +1,4 @@
-# Clear All
+# Legends of Loot
 
 A satirical browser game about clearing notifications. You open **Legends of Loot**, a free-to-play
 game you never get to play, and every menu has a red dot. Clearing one unlocks an achievement, and

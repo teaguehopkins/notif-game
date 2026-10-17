@@ -1,4 +1,4 @@
-# Clear All: Build Plan
+# Legends of Loot: Build Plan
 
 See [PRD.md](PRD.md) for the product spec; section references (§) point there.
 

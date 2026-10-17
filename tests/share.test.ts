@@ -5,7 +5,7 @@ describe('share', () => {
   test('formats the share line', () => {
     expect(formatTime(402_000)).toBe('6:42');
     expect(formatTime(5_000)).toBe('0:05');
-    expect(shareLine(214, 402_000)).toBe('I cleared 214 notifications in 6:42 in Clear All 🔴');
+    expect(shareLine(214, 402_000)).toBe('I cleared 214 notifications in 6:42 in Legends of Loot 🔴');
   });
 
   test('uses Web Share when native sharing is preferred', async () => {

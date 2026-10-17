@@ -53,7 +53,7 @@ export function Title() {
   }, [ready]);
   return (
     <main class="title">
-      <p class="title__presents">Clear All presents</p>
+      <p class="title__presents">Legends of Loot Interactive presents</p>
       <h1 class="logo logo--title">
         <span class="logo__top">Legends</span>
         <span class="logo__of">of</span>

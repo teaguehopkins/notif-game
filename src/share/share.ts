@@ -8,7 +8,7 @@ export function formatTime(ms: number): string {
 }
 
 export function shareLine(cleared: number, ms: number): string {
-  return `I cleared ${cleared} notifications in ${formatTime(ms)} in Clear All 🔴`;
+  return `I cleared ${cleared} notifications in ${formatTime(ms)} in Legends of Loot 🔴`;
 }
 
 interface NavLike {

@@ -6,7 +6,7 @@ import { game, useEngine } from '../game';
 import { prefersReducedMotion } from '../motion';
 
 const CREDITS: [string, string[]][] = [
-  ['Clear All', ['A game about clearing notifications']],
+  ['Legends of Loot', ['A game about clearing notifications']],
   ['Notification Design', ['The Red Dot', 'Another Red Dot', 'A Slightly Larger Red Dot']],
   ['Achievement Design', ['An Achievement for Designing Achievements']],
   ['Legal', ['Terms of Service (Updated)', 'Privacy Policy (Updated)', 'Cookie Policy (Required)']],
