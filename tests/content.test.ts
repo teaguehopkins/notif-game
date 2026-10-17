@@ -58,5 +58,6 @@ describe('story content', () => {
     // Every def shows up in at least one run.
     const neverFired = story.defs.filter((d) => !fired.has(d.id));
     expect(neverFired.map((d) => d.id)).toEqual([]);
-  });
+    // ~3s locally; CI runners can be several times slower.
+  }, 60_000);
 });
