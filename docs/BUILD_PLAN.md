@@ -17,7 +17,7 @@ See [PRD.md](PRD.md) for the product spec; section references (§) point there.
 | M8 Persistence               | ✅                                                                                                                                                                               |
 | M9 Share                     | ✅                                                                                                                                                                               |
 | M10 Mobile and accessibility | ✅ full keyboard-only run and full touch-profile run at 375×667 (e2e); axe clean on home, menu, popup; Lighthouse mobile 100/100/100 (perf/a11y/best practices, title screen)    |
-| M11 Polish and deploy        | 🟡 Playwright suite done; hosting not set up yet                                                                                                                                 |
+| M11 Polish and deploy        | ✅ live at https://teaguehopkins.github.io/notif-game/ (Pages workflow on push to main); v1.0.0 release has the itch.io zip                                                      |
 
 ## Project layout (as built)
 
