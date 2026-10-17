@@ -1057,6 +1057,14 @@ button {
   justify-content: center;
   gap: 12px;
 }
+.title__run {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
 .title__stats,
 .title__fine {
   margin: 0;

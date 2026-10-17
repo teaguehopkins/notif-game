@@ -8,7 +8,15 @@ import { zenPack, zenTemplates } from '../content/zen';
 import type { EngineEvent, Instance } from '../engine/types';
 import { musicLayersFor, setMusicEnabled, setMusicLayers, setMusicMode } from '../audio/music';
 import { setMuted, setVolume, setZen, sfx, type SpawnKind } from '../audio/sfx';
-import { load, update, type SaveData } from '../persist/save';
+import {
+  clearRun,
+  load,
+  loadRun,
+  saveRun,
+  update,
+  type RunSave,
+  type SaveData,
+} from '../persist/save';
 import { COLORS, fx } from './fx';
 
 export type Screen = 'title' | 'story' | 'zen' | 'results';
@@ -67,6 +75,8 @@ class Game {
   /** Engine time when Inbox Zero happened. */
   zeroAtMs = signal(0);
   save = signal<SaveData>(load());
+  /** The story run left unfinished last time, if any. The title screen offers to continue it. */
+  savedRun = signal<RunSave | null>(loadRun());
   muted = signal(false);
   music = signal(true);
   volume = signal(0.8);
@@ -101,16 +111,21 @@ class Game {
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
           this.wasHidden = true;
+          // Phones can discard a background tab without warning, so save the clock now.
+          this.persistRun();
         } else {
           this.lastFrame = performance.now();
           if (this.wasHidden && this.screen.value === 'story') this.engine.emit('tabReturn');
           this.wasHidden = false;
         }
       });
+      addEventListener('pagehide', () => this.persistRun());
     }
   }
 
   startStory(): void {
+    clearRun();
+    this.savedRun.value = null;
     const engine = new Engine(story);
     engine.stats.launches = this.save.value.launches;
     this.director = null;
@@ -121,6 +136,60 @@ class Game {
     this.screen.value = 'story';
     engine.start();
     if (this.save.value.launches > 1) engine.emit('returnVisit');
+  }
+
+  /** Picks the saved run back up where it was, clock paused while you were away. */
+  resumeStory(): void {
+    const run = this.savedRun.value;
+    const engine = run && Engine.restore(story, run.engine);
+    if (!run || !engine) {
+      this.startStory();
+      return;
+    }
+    this.director = null;
+    this.reset(engine);
+    for (const s of run.seen) {
+      const def = engine.byId.get(s.id);
+      if (def)
+        this.seen.set(s.id, {
+          def,
+          title: s.title,
+          body: s.body,
+          spawnedAt: 0,
+          seq: 0,
+          snoozes: 0,
+        });
+    }
+    this.avatar.value = run.avatar;
+    this.zeroAtMs.value = run.zeroAtMs;
+    this.clock.value = engine.now;
+    this.lastClearAt = engine.now;
+    this.lastLevel = engine.stats.level ?? 1;
+    setZen(false);
+    if (engine.phase === 'main') {
+      setMusicLayers(musicLayersFor(engine.stats.cleared ?? 0, engine.hasFired('event_begins')));
+      setMusicMode('launcher');
+    } else {
+      setMusicMode(engine.isActive(FINALE_CREDITS) ? 'credits' : 'zero');
+    }
+    this.screen.value = 'story';
+    // You left and came back: that's an achievement.
+    engine.emit('tabReturn');
+    this.persistRun();
+  }
+
+  /** Saves the story run in progress. Zen has nothing to resume beyond its lifetime counter. */
+  private persistRun(): void {
+    if (this.screen.value !== 'story' || this.engine.phase === 'done') return;
+    const run: RunSave = {
+      v: 1,
+      engine: this.engine.snapshot(),
+      seen: [...this.seen.values()].map((i) => ({ id: i.def.id, title: i.title, body: i.body })),
+      avatar: this.avatar.value,
+      zeroAtMs: this.zeroAtMs.value,
+    };
+    saveRun(run);
+    this.savedRun.value = run;
   }
 
   startZen(): void {
@@ -213,6 +282,7 @@ class Game {
       this.checkLevelUp();
       this.version.value++;
     });
+    this.persistRun();
     if (cleared) {
       sfx.clear();
       if (typeof window !== 'undefined') fx.pop();
@@ -275,6 +345,8 @@ class Game {
   }
 
   private finishRun(): void {
+    clearRun();
+    this.savedRun.value = null;
     const time = this.zeroAtMs.value;
     const cleared = this.engine.stats.cleared ?? 0;
     this.save.value = update((d) => {

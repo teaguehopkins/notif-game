@@ -21,6 +21,33 @@ interface Pending {
 
 type Listener = (events: EngineEvent[]) => void;
 
+interface InstanceSnapshot {
+  id: string;
+  title: string;
+  body: string;
+  spawnedAt: number;
+  seq: number;
+  snoozes: number;
+}
+
+/** Plain JSON for a story run in progress. Defs are referenced by id. */
+export interface EngineSnapshot {
+  now: number;
+  phase: Phase;
+  seq: number;
+  stats: Record<string, number>;
+  active: InstanceSnapshot[];
+  fired: string[];
+  cleared: [string, string | null][];
+  events: string[];
+  pending: { id: string; at: number; inst?: InstanceSnapshot }[];
+}
+
+function instSnapshot(inst: Instance): InstanceSnapshot {
+  const { def, ...rest } = inst;
+  return { id: def.id, ...rest };
+}
+
 /**
  * The notification cascade. Pure TS, no DOM: the UI and the simulation bot drive it the same way.
  *
@@ -125,6 +152,66 @@ export class Engine {
   subscribe(fn: Listener): () => void {
     this.listeners.add(fn);
     return () => this.listeners.delete(fn);
+  }
+
+  // ---- saving ----
+
+  snapshot(): EngineSnapshot {
+    return {
+      now: this.now,
+      phase: this.phase,
+      seq: this.seq,
+      stats: { ...this.stats },
+      active: this.getActive().map(instSnapshot),
+      fired: [...this.fired],
+      cleared: [...this.clearedOutcomes].map(([id, o]) => [id, o ?? null]),
+      events: [...this.events],
+      pending: this.pending.map((p) => ({
+        id: p.def.id,
+        at: p.at,
+        ...(p.inst ? { inst: instSnapshot(p.inst) } : {}),
+      })),
+    };
+  }
+
+  /**
+   * Rebuilds an engine from a snapshot without emitting anything. Returns null if the snapshot
+   * names a def this pack doesn't have (the content changed since it was saved).
+   */
+  static restore(pack: ContentPack, snap: EngineSnapshot): Engine | null {
+    const engine = new Engine(pack);
+    const inst = (s: InstanceSnapshot): Instance | null => {
+      const def = engine.byId.get(s.id);
+      if (!def) return null;
+      return {
+        def,
+        title: s.title,
+        body: s.body,
+        spawnedAt: s.spawnedAt,
+        seq: s.seq,
+        snoozes: s.snoozes,
+      };
+    };
+    for (const s of snap.active) {
+      const i = inst(s);
+      if (!i) return null;
+      engine.active.set(s.id, i);
+    }
+    for (const p of snap.pending) {
+      const def = engine.byId.get(p.id);
+      if (!def) return null;
+      const i = p.inst ? inst(p.inst) : undefined;
+      if (i === null) return null;
+      engine.pending.push(i ? { def, at: p.at, inst: i } : { def, at: p.at });
+    }
+    engine.now = snap.now;
+    engine.phase = snap.phase;
+    engine.seq = snap.seq;
+    engine.stats = { ...snap.stats };
+    engine.fired = new Set(snap.fired);
+    engine.clearedOutcomes = new Map(snap.cleared.map(([id, o]) => [id, o ?? undefined]));
+    engine.events = new Set(snap.events);
+    return engine;
   }
 
   // ---- actions ----

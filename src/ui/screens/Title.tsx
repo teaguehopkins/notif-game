@@ -49,6 +49,7 @@ export function Title() {
   const [progress, setProgress] = useState(prefersReducedMotion() ? 1 : 0);
   const [tip, setTip] = useState(0);
   const save = game.save.value;
+  const run = game.savedRun.value;
 
   useEffect(() => {
     if (progress >= 1) return;
@@ -69,9 +70,10 @@ export function Title() {
     };
   }, []);
 
-  const begin = (mode: 'story' | 'zen') => {
+  const begin = (mode: 'continue' | 'story' | 'zen') => {
     unlockAudio();
-    if (mode === 'story') game.startStory();
+    if (mode === 'continue') game.resumeStory();
+    else if (mode === 'story') game.startStory();
     else game.startZen();
   };
 
@@ -123,14 +125,33 @@ export function Title() {
             : TIPS[tip]}
       </p>
       <div class="title__actions">
-        <button
-          class="btn btn--gold btn--huge"
-          disabled={!ready}
-          onClick={() => begin('story')}
-          ref={startRef}
-        >
-          {save.runsCompleted > 0 ? 'Play Again' : 'Start'}
-        </button>
+        {run ? (
+          <>
+            <button
+              class="btn btn--gold btn--huge"
+              disabled={!ready}
+              onClick={() => begin('continue')}
+              ref={startRef}
+            >
+              Continue
+              <span class="title__run">
+                {run.engine.stats.cleared ?? 0} cleared · {formatTime(run.engine.now)}
+              </span>
+            </button>
+            <button class="btn" disabled={!ready} onClick={() => begin('story')}>
+              New Game
+            </button>
+          </>
+        ) : (
+          <button
+            class="btn btn--gold btn--huge"
+            disabled={!ready}
+            onClick={() => begin('story')}
+            ref={startRef}
+          >
+            {save.runsCompleted > 0 ? 'Play Again' : 'Start'}
+          </button>
+        )}
         {save.zenUnlocked && (
           <button class="btn" disabled={!ready} onClick={() => begin('zen')}>
             🧘 Zen Mode

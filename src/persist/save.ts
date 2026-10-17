@@ -1,3 +1,5 @@
+import type { EngineSnapshot } from '../engine/engine';
+
 /** Versioned localStorage save. Every access is guarded: the game must work without storage. */
 export interface SaveData {
   v: 1;
@@ -67,4 +69,44 @@ export function update(fn: (data: SaveData) => void): SaveData {
   fn(data);
   save(data);
   return data;
+}
+
+/** A story run in progress, kept under its own key so a bad one can't cost the lifetime save. */
+export interface RunSave {
+  v: 1;
+  engine: EngineSnapshot;
+  /** Cleared instances, so menus can keep showing what you've seen. */
+  seen: { id: string; title: string; body: string }[];
+  avatar: string;
+  /** Engine time of Inbox Zero, once it has happened. */
+  zeroAtMs: number;
+}
+
+export const RUN_KEY = 'clear-all/run';
+
+export function loadRun(): RunSave | null {
+  try {
+    const raw = storage()?.getItem(RUN_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as RunSave;
+    return parsed.v === 1 && parsed.engine ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveRun(run: RunSave): void {
+  try {
+    storage()?.setItem(RUN_KEY, JSON.stringify(run));
+  } catch {
+    // Same as save(): the run just won't survive a reload.
+  }
+}
+
+export function clearRun(): void {
+  try {
+    storage()?.removeItem(RUN_KEY);
+  } catch {
+    // Nothing to do.
+  }
 }

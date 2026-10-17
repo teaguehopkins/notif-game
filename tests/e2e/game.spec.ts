@@ -42,6 +42,36 @@ test('full run reaches Inbox Zero, credits, and results', async ({ page }) => {
   await expect(page.getByRole('button', { name: /Zen Mode/ })).toBeVisible({ timeout: 8000 });
 });
 
+test('a refresh mid-run continues where it left off, and the run still finishes', async ({
+  page,
+}) => {
+  await freshStart(page);
+  const savedCleared = () =>
+    page.evaluate(
+      () => JSON.parse(localStorage.getItem('clear-all/run') ?? 'null')?.engine.stats.cleared ?? 0,
+    );
+  await playUntil(page, async () => (await savedCleared()) >= 40);
+  // Let the current action settle so the save and the count agree.
+  await page.waitForTimeout(300);
+  const before = (await savedCleared()) as number;
+
+  await page.reload();
+  const resume = page.getByRole('button', { name: /^Continue/ });
+  await expect(resume).toContainText(`${before} cleared`, { timeout: 8000 });
+  await expect(page.getByRole('button', { name: 'New Game' })).toBeVisible();
+  await resume.click({ timeout: 8000 });
+  await expect(page.locator('[data-stat=cleared]')).toHaveText(
+    new RegExp(`^\\D*${before} cleared$`),
+  );
+  await expect(page.locator('.toast', { hasText: 'Welcome Back!' })).toBeVisible();
+
+  await playUntil(page, async () => (await page.locator('.results').count()) > 0);
+  const cleared = Number(await page.locator('.results__stats div:nth-child(2) dd').innerText());
+  expect(cleared).toBeGreaterThan(before);
+  // A finished run leaves nothing to continue.
+  expect(await page.evaluate(() => localStorage.getItem('clear-all/run'))).toBeNull();
+});
+
 test('Mark All As Read clears everything and spawns the FOMO popup', async ({ page }) => {
   await freshStart(page);
   const markAll = page.getByRole('button', { name: /Mark All As Read/ });
