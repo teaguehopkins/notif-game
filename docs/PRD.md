@@ -1,7 +1,7 @@
 # Clear All: Product Requirements
 
 ## 1. Pitch
-**Working title:** *Clear All*. Inside the fiction, the launcher belongs to a made-up F2P game called **"Lootmoor Legends"**. You open the game and never get to play it. Every button has a red dot. Every dot leads to a menu, and every menu has more dots. Clearing one earns *"Achievement: You Cleared a Notification!"*, which is itself a notification. The goal is Inbox Zero.
+**Working title:** *Clear All*. Inside the fiction, the launcher belongs to a made-up F2P game called **"Legends of Loot"**. You open the game and never get to play it. Every button has a red dot. Every dot leads to a menu, and every menu has more dots. Clearing one earns *"Achievement: You Cleared a Notification!"*, which is itself a notification. The goal is Inbox Zero.
 
 ## 2. Goals and non-goals
 **Goals**
@@ -125,7 +125,7 @@ Target: **150–250 clears** in 5–10 minutes. That assumes about 2–3 seconds
 - Lighthouse mobile ≥ 90 for performance and accessibility. The bundle is under 150KB gzipped.
 
 ## 11. Open questions / defaults chosen
-- **Name:** *Clear All*, with the fictional launcher game "Lootmoor Legends". Easy to change.
+- **Name:** *Clear All*, with the fictional launcher game "Legends of Loot". Easy to change.
 - **Hosting:** GitHub Pages by default, with an itch.io zip as a secondary option.
 - **Art:** CSS, SVG, and emoji only, with no image assets in v1. The look is a gold-and-wood gradient UI with chunky buttons and a lot of glow.
 - **Hint system:** after 20 seconds with no clear, the deepest unseen dot pulses and the parent chain glows. Using it unlocks *"Needed a Hint"*.
