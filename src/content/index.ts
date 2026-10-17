@@ -19,4 +19,5 @@ export const OPTIONAL_EVENTS = [
   'clickedPlay',
   'touchedPrefs',
   'setAvatar',
+  'returnVisit',
 ];
