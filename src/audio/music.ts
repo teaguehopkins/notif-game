@@ -103,10 +103,18 @@ export function setMusicMode(next: MusicMode): void {
 }
 
 function stopRain(): void {
+  if (!rain) return;
+  // audioOut() is null while muted, but the loop must still stop, or it plays on after unmuting.
   const a = audioOut();
-  if (rain && a) {
-    rain.gain.gain.setTargetAtTime(0, a.ctx.currentTime, 0.3);
-    rain.src.stop(a.ctx.currentTime + 1.5);
+  try {
+    if (a) {
+      rain.gain.gain.setTargetAtTime(0, a.ctx.currentTime, 0.3);
+      rain.src.stop(a.ctx.currentTime + 1.5);
+    } else {
+      rain.src.stop();
+    }
+  } catch {
+    // Already stopped.
   }
   rain = null;
 }

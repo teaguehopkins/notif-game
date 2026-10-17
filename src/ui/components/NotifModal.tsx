@@ -430,22 +430,24 @@ function Pack({ inst, onClear, contents }: InteractionProps) {
                 <button
                   class={`pack-slot pack-slot--${rarity}${isUp ? ' pack-slot--up' : ''}`}
                   onClick={() => flip(i)}
-                  aria-label={
-                    isUp ? `${name}, ${RARITY_LABEL[rarity]}` : `Card ${i + 1}, face down. Flip it.`
-                  }
+                  // Face up, the card's own text names the button; face down there's no text.
+                  aria-label={isUp ? undefined : `Card ${i + 1}, face down. Flip it.`}
                 >
                   <span class="pack-slot__inner">
                     <span class="pack-slot__back">
                       <CardBack />
                     </span>
                     <span class="pack-slot__front">
-                      <CardFace
-                        name={name}
-                        icon={c.icon}
-                        rarity={rarity}
-                        text={c.body}
-                        stamp={/^Duplicate/.test(c.title) ? 'Duplicate' : undefined}
-                      />
+                      {isUp && (
+                        <CardFace
+                          spoken
+                          name={name}
+                          icon={c.icon}
+                          rarity={rarity}
+                          text={c.body}
+                          stamp={/^Duplicate/.test(c.title) ? 'Duplicate' : undefined}
+                        />
+                      )}
                     </span>
                   </span>
                 </button>

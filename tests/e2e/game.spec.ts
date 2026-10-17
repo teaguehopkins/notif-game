@@ -153,3 +153,20 @@ test('the hidden sound check page lists every sound and plays without errors', a
     await page.getByRole('button', { name, exact: true }).click();
   }
 });
+
+test.describe('with reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' });
+
+  test('a full run still works, and the pack and results pass axe', async ({ page }) => {
+    const scan = async (where: string) => {
+      const { violations } = await new AxeBuilder({ page }).analyze();
+      expect(violations.map((v) => `${where}: ${v.id} (${v.nodes.length}) ${v.help}`)).toEqual([]);
+    };
+    await freshStart(page);
+    await playUntil(page, async () => (await page.locator('.pack-fan').count()) > 0);
+    await scan('fanned pack');
+    await playUntil(page, async () => (await page.locator('.results').count()) > 0);
+    await expect(page.getByRole('img', { name: /^Result card/ })).toBeVisible();
+    await scan('results');
+  });
+});

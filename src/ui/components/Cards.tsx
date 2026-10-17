@@ -22,24 +22,33 @@ interface FaceProps {
   text?: string;
   small?: boolean;
   stamp?: string;
+  /**
+   * Read the card out (its cost, name and rarity) instead of hiding it from screen readers. For a
+   * card that is itself the content of a button, so the button's name matches what it shows.
+   */
+  spoken?: boolean;
 }
 
 /** A collectible card: a rarity frame, a mana gem, and procedurally tinted portrait art. */
-export function CardFace({ name, icon, rarity = 'common', text, small, stamp }: FaceProps) {
+export function CardFace({ name, icon, rarity = 'common', text, small, stamp, spoken }: FaceProps) {
   const h = hash(name);
   const mana = /(\d+) mana/.exec(text ?? '')?.[1] ?? String(h % 10);
   return (
     <span
       class={`card card--${rarity}${small ? ' card--small' : ''}`}
       style={{ '--hue': h % 360, '--hue2': (h >> 9) % 360 }}
-      aria-hidden="true"
+      aria-hidden={spoken ? undefined : 'true'}
     >
-      <span class="card__art">
+      <span class="card__art" aria-hidden="true">
         <span class="card__glyph">{icon ?? '🃏'}</span>
       </span>
-      <span class="card__mana">{mana}</span>
+      <span class="card__mana">
+        {mana}
+        {spoken && <span class="sr-only"> mana, </span>}
+      </span>
       {!small && <span class="card__name">{name}</span>}
-      <span class="card__gem" />
+      {spoken && <span class="sr-only">, {rarity}</span>}
+      <span class="card__gem" aria-hidden="true" />
       {stamp && <span class="card__stamp">{stamp}</span>}
     </span>
   );
