@@ -7,7 +7,7 @@ import { fx } from '../fx';
 import { prefersReducedMotion } from '../motion';
 
 const CREDITS: [string, string[]][] = [
-  ['Legends of Loot', ['A game about clearing notifications']],
+  ['Legends of Loot', ['A game about clearing notifications', 'Made by Zen Wombat']],
   ['Notification Design', ['The Red Dot', 'Another Red Dot', 'A Slightly Larger Red Dot']],
   ['Achievement Design', ['An Achievement for Designing Achievements']],
   ['Legal', ['Terms of Service (Updated)', 'Privacy Policy (Updated)', 'Cookie Policy (Required)']],

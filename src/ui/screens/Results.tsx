@@ -121,6 +121,12 @@ export function Results() {
             {line}
           </textarea>
         )}
+        <p class="results__studio">
+          Enjoyed this?{' '}
+          <a href="https://zenwombat.com/" target="_blank" rel="noopener">
+            More games from Zen Wombat
+          </a>
+        </p>
       </div>
     </main>
   );

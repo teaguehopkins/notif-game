@@ -166,6 +166,9 @@ export function Title() {
         </p>
       )}
       <p class="title__fine">A satire of notification overload. Sound on recommended. 🔴</p>
+      <p class="title__fine">
+        A <a href="https://zenwombat.com/">Zen Wombat</a> game
+      </p>
     </main>
   );
 }

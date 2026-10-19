@@ -1071,6 +1071,10 @@ button {
   font-size: 0.85rem;
   color: var(--text-dim);
 }
+.title__fine a {
+  color: var(--gold-2);
+  text-underline-offset: 3px;
+}
 
 /* ---------- effects ---------- */
 
@@ -1840,6 +1844,18 @@ button {
 .results__share-card a {
   color: var(--ink-soft);
   font-weight: 800;
+}
+.results__studio {
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--paper-edge);
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+.results__studio a {
+  color: var(--ink);
+  font-weight: 800;
+  text-underline-offset: 3px;
 }
 .slider {
   display: flex;
