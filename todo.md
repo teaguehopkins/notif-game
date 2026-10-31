@@ -2,7 +2,7 @@
 
 Ideas for more sound, images and animation.
 
-**Status (2026-10-17):** all built on the `pizzazz` branch. Listen to every sound at `?sfx` (a
+**Status (2026-10-17):** all built, and merged into `main`. Listen to every sound at `?sfx` (a
 hidden sound-check page). Not yet checked by a person: how the sounds actually sound, haptics, and
 sharing the result image from a real phone.
 
